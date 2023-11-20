@@ -6,6 +6,9 @@ use Page;
 use SilverStripe\Forms\DateField;
 use SilverStripe\Forms\TextareaField;
 use SilverStripe\Forms\TextField;
+use SilverStripe\Assets\Image;
+use SilverStripe\Assets\File;
+use SilverStripe\AssetAdmin\Forms\UploadField;
 
 class ArticlePage extends Page
 {
@@ -17,6 +20,18 @@ class ArticlePage extends Page
         'Author' => 'Varchar',
     ];
 
+    private static $has_one = [
+        'Photo' => Image::class,
+        'Brochure' => File::class
+    ];
+
+    // It would be nice if when we published the article, any attached files became implicitly published as well.
+    // For that, we need to declare ownership of the files to ensure they receive publication by association.
+    private static $owns = [
+        'Photo',
+        'Brochure',
+    ];
+
     public function getCMSFields()
     {
       $fields = parent::getCMSFields();
@@ -25,6 +40,14 @@ class ArticlePage extends Page
       $fields->addFieldToTab('Root.Main', TextareaField::create('Teaser')
         ->setDescription('This is the summary that appears on the article list page.'), 'Content');
       $fields->addFieldToTab('Root.Main', TextField::create('Author','Author of article'), 'Content');
+
+      $fields->addFieldToTab('Root.Attachments', $photo = UploadField::create('Photo'));
+      $fields->addFieldToTab('Root.Attachments', $brochure = UploadField::create('Brochure','Travel brochure, optional (PDF only)'));
+
+      $photo->setFolderName('travel-photos');
+      $brochure
+        ->setFolderName('travel-brochures')
+        ->getValidator()->setAllowedExtensions(array('pdf'));
 
       return $fields;
     }
