@@ -26,6 +26,9 @@
             ".htaccess",
             "index.php",
             "web.config"
+        ],
+        "expose": [
+            "themes/my-theme/css"
         ]
     },
     "config": {
